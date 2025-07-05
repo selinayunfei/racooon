@@ -16,9 +16,8 @@ from pygame.locals import (
 
 pygame.init()
 
-SCREEN_WIDTH = 1080
+SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-
 def text_box(text):
     return None
 
