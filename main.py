@@ -320,7 +320,11 @@ while running:
                 [["1. i mean. like sure ? i'm lowkey desperate.","2. AH HELL NAH", "3. yeah? do i get your mansion then?"],["1. bruh. i guess this is all you have. thanks i guess.","2. you're not actually rich, are you? wtf","3. like the core of an apple iphone? i knew it! you're like rich!"],["1. you're not actually rich, are you? wtf","2. like the core of an apple iphone? i knew it! you're like rich!","3. calm YOURself. give me your credit card info."]]
             ]
         if level == "weirdguy":
+            all_sprites.remove(raccoon)
+            raccoon.kill()
             walking_animation("good_weird_guy_fat_chibi.png")
+            raccoon = create_raccoon("weirdguy_default_flirting_heart.png")
+            all_sprites.add(raccoon)
             lovebar = LoveBar('50.png',(300,60))
             nl = 2
 
@@ -423,6 +427,11 @@ while running:
                                 screen.blit(memory, memory_rect)
                                 pygame.display.update()
                                 time.sleep(5)
+                            if current_dialogue == 1 and level == "weirdguy":
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("weirdguy_skibidi_blush_1.png")
+                                all_sprites.add(raccoon)
                             if current_dialogue == 2 and level == "bestfriend":
                                 all_sprites.remove(raccoon)     
                                 raccoon.kill()
@@ -436,6 +445,11 @@ while running:
                             currentChoice = 0
                             dialogue.append([all_dialogue[current_dialogue][0]])
                         elif pressed_keys[K_2]:
+                            if level == "weirdguy" and current_dialogue == 1:
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("weirdguy_you_dont_1.png")
+                                all_sprites.add(raccoon)
                             if level == "richguy" and current_dialogue == 3:
                                 all_sprites.remove(raccoon)     
                                 raccoon.kill()
@@ -444,6 +458,11 @@ while running:
                             currentChoice = 1
                             dialogue.append([all_dialogue[current_dialogue][1]])
                         elif pressed_keys[K_3]:
+                            if level == "weirdguy" and current_dialogue == 1:
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("weirdguy_hmm_maybe_house_1.png")
+                                all_sprites.add(raccoon)
                             if level == "richguy" and current_dialogue == 1:
                                 all_sprites.remove(raccoon)     
                                 raccoon.kill()
