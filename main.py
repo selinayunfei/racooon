@@ -148,7 +148,7 @@ def ending(end):
                     if current_dialogue < len(dialogue) - 1:
                         current_dialogue += 1
                     else:
-                        if end[-1] == 'H' or end[-1]=='G' or end == "THG":
+                        if (end[-1] == 'H' or end[-1]=='G') and end != "THG":
                             running = False
                             cont = True
                         else:
@@ -307,7 +307,10 @@ while running:
     if current_line == len(dialogue[current_dialogue]) - 1:
         choice_height = 375
         if current_dialogue < 4:
-            pygame.draw.rect(screen, (255, 192, 203), (790, 370, 460, 160))
+            choices_image = pygame.image.load("actualchoices.png")
+            choices_image = pygame.transform.scale(choices_image, (460, 160))
+            choices_rect = choices_image.get_rect(center = (1020, 450))
+            screen.blit(choices_image, choices_rect)
             if current_dialogue < 3:
                 for choice in choices[current_dialogue]:                
                     wrapped = wrap_text(choice, font, 450)
