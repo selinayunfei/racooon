@@ -146,7 +146,7 @@ def ending(end):
                     if current_dialogue < len(dialogue) - 1:
                         current_dialogue += 1
                     else:
-                        if end[-1] == 'H' or end[-1]=='G':
+                        if end[-1] == 'H' or end[-1]=='G' or end == "THG":
                             running = False
                             cont = True
                         else:
@@ -173,6 +173,7 @@ bg = pygame.image.load("wp5641813.webp")
 
 all_sprites = pygame.sprite.Group()
 font = pygame.font.SysFont('comicsansms', 20)
+pink = (255, 105, 180)
 
 # Add after defining your font (or near top)
 def wrap_text(text, font, max_width):
@@ -300,12 +301,13 @@ while running:
     if current_line == len(dialogue[current_dialogue]) - 1:
         choice_height = 375
         if current_dialogue < 4:
+            pygame.draw.rect(screen, (255, 192, 203), (790, 370, 460, 160))
             if current_dialogue < 3:
-                for choice in choices[current_dialogue]:
+                for choice in choices[current_dialogue]:                
                     wrapped = wrap_text(choice, font, 450)
                     for line in wrapped:
                         choice_surface = font.render(line, True, (0, 0, 0))
-                        choice_rect = choice_surface.get_rect(center=(1000, choice_height))
+                        choice_rect = choice_surface.get_rect(topleft=(800, choice_height))
                         screen.blit(choice_surface, choice_rect)
                         choice_height += 25
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
@@ -316,9 +318,19 @@ while running:
                             currentChoice = 0
                             dialogue.append([all_dialogue[current_dialogue][0]])
                         elif pressed_keys[K_2]:
+                            if level == "richguy" and current_dialogue == 3:
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("richguy_sigh_WITH_sigh_bubble.png")
+                                all_sprites.add(raccoon)
                             currentChoice = 1
                             dialogue.append([all_dialogue[current_dialogue][1]])
                         elif pressed_keys[K_3]:
+                            if level == "richguy" and current_dialogue == 1:
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("richguy_sad_look_at_watch.png")
+                                all_sprites.add(raccoon)
                             currentChoice = 2
                             dialogue.append([all_dialogue[current_dialogue][2]])
                         current_line = 0
@@ -331,14 +343,13 @@ while running:
                     wrapped = wrap_text(choice, font, 450)
                     for line in wrapped:
                         choice_surface = font.render(line, True, (0, 0, 0))
-                        choice_rect = choice_surface.get_rect(center=(1000, choice_height))
+                        choice_rect = choice_surface.get_rect(topleft=(800, choice_height))
                         screen.blit(choice_surface, choice_rect)
                         choice_height += 25  # smaller spacing since it's in a tighter box
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
                         nl = updating_lovebar(nl,lovebars,lovebar)
                         newChoice = False
                         current_dialogue += 1
-
                         if level == "richguy" or level == "weirdguy":
                             if currentChoice == 0:
                                 if pressed_keys[K_1]:
@@ -361,7 +372,11 @@ while running:
                                     dialogue.append([all_dialogue[current_dialogue][1]])
                                 elif pressed_keys[K_3]:
                                     dialogue.append([all_dialogue[current_dialogue][1]])
-                                    
+                            if dialogue[-1] == [all_dialogue[current_dialogue][0]]:
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("richguy_default_V2_blush_and_heart.png")
+                                all_sprites.add(raccoon)
                         if level == "bestfriend":
                             if currentChoice == 0:
                                 dialogue.append([all_dialogue[current_dialogue][0]])
