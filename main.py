@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import time
+import math
 
 pygame.init()
 
@@ -91,7 +92,7 @@ def create_raccoon(image):
 
 def update_raccoon(raccoon):
     raccoon.rect.move_ip(0,raccoon.speed)
-    if raccoon.rect.centery <= 340 or raccoon.rect.centery >= 380:
+    if raccoon.rect.centery <= 350 or raccoon.rect.centery >= 390:
         raccoon.speed = -raccoon.speed
 
 def ending(end):
@@ -196,6 +197,72 @@ def wrap_text(text, font, max_width):
 
     return lines
 
+def walking_animation(png):
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
+    
+    end = False
+    
+    door_opening = pygame.mixer.Sound("door.mp3")
+    walking = pygame.mixer.Sound("walking.mp3")
+
+    door_opening.play()
+    pygame.time.set_timer(USEREVENT + 1, 1000)
+    pygame.time.set_timer(USEREVENT + 2, 10000)
+
+    def create_raccoon():
+        raccoon = pygame.sprite.Sprite()
+        raccoon.original_image = pygame.image.load(png).convert_alpha()
+        raccoon.image = raccoon.original_image
+        raccoon.rect = raccoon.image.get_rect(center=(0, 0))  # Start from top-left corner
+        raccoon.speed_x = 2   # Horizontal speed
+        raccoon.speed_y = 1   # Vertical speed
+        raccoon.angle = 0
+        return raccoon
+
+    def update_raccoon(raccoon, frame):
+        # Move diagonally
+        raccoon.rect.x += raccoon.speed_x
+        raccoon.rect.y += raccoon.speed_y
+
+        # Waddle animation using sin wave
+        raccoon.angle = 10 * math.sin(frame / 10)
+        rotated_image = pygame.transform.rotate(raccoon.original_image, raccoon.angle)
+        old_center = raccoon.rect.center
+        raccoon.image = rotated_image
+        raccoon.rect = raccoon.image.get_rect(center=old_center)
+
+
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    bg = pygame.image.load("bg 2 - Tim Hortons, entrance.png")
+    bg = pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+    raccoon = create_raccoon()
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(raccoon)
+
+    clock = pygame.time.Clock()
+    running = True
+    frame = 0
+    walking_started = False
+
+    while running:
+        frame += 1
+        for event in pygame.event.get():
+            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                running = False
+            elif event.type == USEREVENT + 1 and not walking_started:
+                walking.play(loops = 1)
+                walking_started = True
+            elif event.type == USEREVENT + 2:
+                return
+
+        update_raccoon(raccoon, frame)
+
+        screen.blit(bg, (0, 0))
+        all_sprites.draw(screen)
+        pygame.display.update()
+        clock.tick(60)  # Limit frame rate
 
 # Game state
 lovebars = ["0.png","25.png","50.png","75.png","100.png"]
@@ -208,6 +275,7 @@ running = True
 start = True
 frame = 0
 opening_sequence()
+clock = pygame.time.Clock()
 while running:
     frame += 1
     if start:
@@ -215,6 +283,7 @@ while running:
         current_dialogue = 0
         current_line = 0
         if level == "richguy":
+            walking_animation("good_rich_guy_fat_chibi.png")
             raccoon = create_raccoon("richguy_default_smirk.png")
             all_sprites.add(raccoon)
             lovebar = LoveBar('25.png',(300,60))
@@ -232,6 +301,7 @@ while running:
                 [["1. i mean. like sure ? i'm lowkey desperate.","2. AH HELL NAH", "3. yeah? do i get your mansion then?"],["1. bruh. i guess this is all you have. thanks i guess.","2. you're not actually rich, are you? wtf","3. like the core of an apple iphone? i knew it! you're like rich!"],["1. you're not actually rich, are you? wtf","2. like the core of an apple iphone? i knew it! you're like rich!","3. calm YOURself. give me your credit card info."]]
             ]
         if level == "weirdguy":
+            walking_animation("good_weird_guy_fat_chibi.png")
             lovebar = LoveBar('50.png',(300,60))
             nl = 2
 
@@ -249,6 +319,8 @@ while running:
         if level == "bestfriend":
             all_sprites.remove(raccoon)
             raccoon.kill()
+            
+            walking_animation("good_childhood_friend_fat_chibi.png")
             raccoon = create_raccoon("childhood bestie 2 entrance w rose.png")
             all_sprites.add(raccoon)
             lovebar = LoveBar('75.png',(300,60))
@@ -271,7 +343,7 @@ while running:
         all_sprites.add(text_box)
 
         start = False
-    if frame % 10 == 0:
+    if frame % 3 == 0:
         update_raccoon(raccoon)
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -325,7 +397,7 @@ while running:
                         current_dialogue += 1
                         nl = updating_lovebar(nl,lovebars,lovebar)
                         if pressed_keys[K_1]:
-                            if current_dialogue == 1:
+                            if current_dialogue == 1 and level == "bestfriend":
                                 memory = pygame.image.load("childhood best friend - the first meeting, pictures.png")
                                 memory = pygame.transform.scale(memory, (1400,800))
                                 memory_rect = memory.get_rect(center = (640, 360))
@@ -454,7 +526,8 @@ while running:
                     else:
                         running = ending("THB")
                 if n < len(levels):
-                    level = levels[n] 
+                    level = levels[n]
+    clock.tick(60)
     pygame.display.update()
 
 pygame.quit()
