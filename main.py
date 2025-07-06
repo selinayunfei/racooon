@@ -45,14 +45,64 @@ def create_text_box(text, colour):
     box.text = text
     return box
 
+def title_screen():
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
+    def create_header(image):
+        header = pygame.sprite.Sprite()
+        header.image = pygame.image.load(image).convert_alpha()
+        header.image = pygame.transform.scale(header.image, (1280, 720))
+        header.rect = header.image.get_rect(center = (640, 360))
+        header.speed = 1
+        return header
+    def create_bar(image):
+        bar = pygame.sprite.Sprite()
+        bar.image = pygame.image.load(image).convert_alpha()
+        bar.image = pygame.transform.scale(bar.image, (1280, 720))
+        bar.rect = bar.image.get_rect(center = (640, 360))
+        bar.speed = 1
+        return bar
+    def update_header(header):
+        header.rect.move_ip(0,header.speed)
+        if header.rect.centery <= 330 or header.rect.centery >= 370:
+            header.speed = -header.speed
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    header = create_header("title screen heading.png")
+    bar = create_bar("title screen press bar.png")
+    all_sprites = pygame.sprite.Group()
+    all_sprites.add(header)
+    bg = pygame.image.load("title screen bg.png")
+    screen.blit(bg,(0,0))
+    running = True
+    frame = 0
+    while running:
+        screen.blit(bg, (0, 0))
+        all_sprites.draw(screen)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            elif event.type == KEYDOWN:
+                if event.key == K_RETURN: 
+                    running = False
+        if frame % 120 == 0:
+            all_sprites.add(bar)
+        if frame % 120 == 60:
+            all_sprites.remove(bar)
+
+        frame += 1
+        if frame % 5 == 0:
+            update_header(header)
+
+        pygame.display.update()
+
+
 
 def opening_sequence():
     SCREEN_WIDTH = 1280
     SCREEN_HEIGHT = 720
     
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-    color = (252, 212, 210)
-    screen.fill(color)
+    bg = pygame.image.load("title screen bg.png")
     
     texts = ["It's another day. Another great day!", 
              "You walk into Tim Hortons.", 
@@ -65,7 +115,7 @@ def opening_sequence():
     
     running = True
     while running:
-        screen.fill(color) 
+        screen.blit(bg,(0,0)) 
         
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -293,6 +343,7 @@ newChoice = True
 running = True
 start = True
 frame = 0
+title_screen()
 opening_sequence()
 clock = pygame.time.Clock()
 while running:
