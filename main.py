@@ -25,6 +25,8 @@ def updating_lovebar(index,lovebars,lovebar):
     elif pressed_keys[K_3]:
         index -= 1
         if index >= 0:
+            if index > 4:
+                index = 4
             lovebar.update_bar(lovebars[index])
     return index
 
@@ -169,7 +171,7 @@ def ending(end):
     return cont
 
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
-bg = pygame.image.load("wp5641813.webp")
+bg = pygame.image.load("sittingTH.png")
 
 all_sprites = pygame.sprite.Group()
 font = pygame.font.SysFont('comicsansms', 20)
@@ -244,6 +246,10 @@ while running:
                 [["1. are you high?","2. you're sick in the head.","fine. maybe it is."], ["1. no.","2.yes, i think i feel something... heartburn. ate my lunch too fast.","3. oh, it was pounding loud enough you could hear it?"],["1. not really.","2. it is - do you perhaps know the cure?","3. pouding with the sheer affection i'm feeling for you~"]]
             ]
         if level == "bestfriend":
+            all_sprites.remove(raccoon)
+            raccoon.kill()
+            raccoon = create_raccoon("childhood bestie 2 entrance w rose.png")
+            all_sprites.add(raccoon)
             lovebar = LoveBar('75.png',(300,60))
             nl = 3
 
@@ -315,6 +321,16 @@ while running:
                         current_dialogue += 1
                         nl = updating_lovebar(nl,lovebars,lovebar)
                         if pressed_keys[K_1]:
+                            if current_dialogue == 2 and level == "bestfriend":
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("childhood bestie 3 small blush.png")
+                                all_sprites.add(raccoon)
+                            if current_dialogue == 3 and level == "bestfriend":
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("childhood bestie 4 big blush.png")
+                                all_sprites.add(raccoon)
                             currentChoice = 0
                             dialogue.append([all_dialogue[current_dialogue][0]])
                         elif pressed_keys[K_2]:
@@ -331,9 +347,19 @@ while running:
                                 raccoon.kill()
                                 raccoon = create_raccoon("richguy_sad_look_at_watch.png")
                                 all_sprites.add(raccoon)
+                            if current_dialogue == 3 and level == "bestfriend":
+                                all_sprites.remove(raccoon)     
+                                raccoon.kill()
+                                raccoon = create_raccoon("childhood bestie 5 heartbroken.png")
+                                all_sprites.add(raccoon)
                             currentChoice = 2
                             dialogue.append([all_dialogue[current_dialogue][2]])
                         current_line = 0
+                        if current_dialogue >= 1 and current_dialogue < 3 and level == "bestfriend":
+                            all_sprites.remove(raccoon)     
+                            raccoon.kill()
+                            raccoon = create_raccoon("childhood bestie 1 normal.png")
+                            all_sprites.add(raccoon)
                         all_sprites.remove(text_box)
                         text_box.kill()
                         text_box = create_text_box(dialogue[current_dialogue][current_line],colour)
@@ -385,12 +411,12 @@ while running:
                                     dialogue.append([all_dialogue[current_dialogue][0]])
                                 else:
                                     dialogue.append([all_dialogue[current_dialogue][1]])
-
                         current_line = 0
                         all_sprites.remove(text_box)
                         text_box.kill()
                         text_box = create_text_box(dialogue[current_dialogue][current_line],colour)
                         all_sprites.add(text_box)
+                        
 
             if not newChoice:
                 if not pressed_keys[K_1] and not pressed_keys[K_2] and not pressed_keys[K_3]:
