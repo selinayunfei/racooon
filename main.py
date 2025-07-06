@@ -6,6 +6,28 @@ pygame.init()
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 
+class LoveBar(pygame.sprite.Sprite):
+    def __init__(self, image_path, pos):
+        super().__init__()
+        self.image = pygame.transform.scale(pygame.image.load(image_path), (500, 50))
+        self.image = self.image.convert_alpha()
+        self.rect = self.image.get_rect(center=pos)
+
+    def update_bar(self, new_image_path):
+        self.image = pygame.transform.scale(pygame.image.load(new_image_path), (500, 50))
+        self.image = self.image.convert_alpha()
+
+def updating_lovebar(index,lovebars,lovebar):
+    if pressed_keys[K_1]:
+        index += 1
+        if index < len(lovebars):
+            lovebar.update_bar(lovebars[index])
+    elif pressed_keys[K_3]:
+        index -= 1
+        if index >= 0:
+            lovebar.update_bar(lovebars[index])
+    return index
+
 def create_text_box(text, colour):
     box = pygame.sprite.Sprite()
     if colour == "yellow":
@@ -18,6 +40,7 @@ def create_text_box(text, colour):
     box.rect = box.image.get_rect(center=(640, 620))
     box.text = text
     return box
+
 
 def opening_sequence():
     SCREEN_WIDTH = 1280
@@ -63,6 +86,7 @@ all_sprites = pygame.sprite.Group()
 font = pygame.font.SysFont('comicsansms', 20)
 
 # Game state
+lovebars = ["0.png","25.png","50.png","75.png","100.png"]
 levels = ["richguy","weirdguy","bestfriend"]
 n = 0
 level = levels[n]
@@ -75,6 +99,9 @@ while running:
         current_dialogue = 0
         current_line = 0
         if level == "richguy":
+            lovebar = LoveBar('25.png',(300,60))
+            nl = 3
+
             colour = "yellow"
             dialogue = [
                 ["*walks in*", "hey babygirl, how you doing?"]
@@ -87,6 +114,9 @@ while running:
                 [["1. i mean. like sure ? i'm lowkey desperate.","2. AH HELL NAH", "3. yeah? do i get your mansion then?"],["1. bruh. i guess this is all you have. thanks i guess.","2. you're not actually rich, are you? wtf","3. like the core of an apple iphone? i knew it! you're like rich!"],["1. you're not actually rich, are you? wtf","2. like the core of an apple iphone? i knew it! you're like rich!","3. calm YOURself. give me your credit card info."]]
             ]
         if level == "weirdguy":
+            lovebar = LoveBar('50.png',(300,60))
+            nl = 2
+
             colour = "red"
             dialogue = [
                 ["*walks in*","are you siri? cuz girl, you auto-complete me."]
@@ -99,6 +129,9 @@ while running:
                 [["1. are you high?","2. you're sick in the head.","fine. maybe it is."], ["1. no.","2.yes, i think i feel something... heartburn. ate my lunch too fast.","3. oh, it was pounding loud enough you could hear it?"],["1. not really.","2. it is - do you perhaps know the cure?","3. pouding with the sheer affection i'm feeling for you~"]]
             ]
         if level == "bestfriend":
+            lovebar = LoveBar('75.png',(300,60))
+            nl = 3
+
             colour = "blue"
             dialogue = [
                 ["*appears before you*","hi y/n! lonmhg timdhje nods seewe! hoiwiw hasave yfgou beedsqen thihgs lafsst yeadar?"]
@@ -110,9 +143,13 @@ while running:
                 ["1. You remembered? Good boy~", "2. Eh. Didn't quite work out in the end, you know?", "3. What the hell? You're tweaking, bro."],
                 [["1. Something else fun, hmm~ I have a few ideas too.", "2. Good. I'm also having a fun time.","3. Oh, just being with me is making you happy?"],["1. Ooh, something else fun? Okay!","2. Sounds good, I'm up for whatever.","3. Not really up to it today."],["1. Sure, since this has been such a disappointment.","2. Eh. Whatever you want.", "3. Who'd want to do something fun with you? You're so clingy."]]
             ]
+        all_sprites.add(lovebar)
+
         text_box = create_text_box(dialogue[current_dialogue][current_line],colour)
         all_sprites.add(text_box)
+
         start = False
+
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -152,6 +189,7 @@ while running:
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
                         newChoice = False
                         current_dialogue += 1
+                        nl = updating_lovebar(nl,lovebars,lovebar)
                         if pressed_keys[K_1]:
                             currentChoice = 0
                             dialogue.append([all_dialogue[current_dialogue][0]])
@@ -173,6 +211,7 @@ while running:
                     screen.blit(choice_surface, choice_rect)
                     choice_height += 40
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
+                        nl = updating_lovebar(nl,lovebars,lovebar)
                         newChoice = False
                         current_dialogue += 1
 
@@ -218,6 +257,7 @@ while running:
                 if not pressed_keys[K_1] and not pressed_keys[K_2] and not pressed_keys[K_3]:
                     newChoice = True
         else:
+            all_sprites.remove(lovebar)
             if pressed_keys[K_RETURN]:
                 n += 1
                 if n < len(levels):
