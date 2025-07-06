@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import time
 
 pygame.init()
 
@@ -324,6 +325,13 @@ while running:
                         current_dialogue += 1
                         nl = updating_lovebar(nl,lovebars,lovebar)
                         if pressed_keys[K_1]:
+                            if current_dialogue == 1:
+                                memory = pygame.image.load("childhood best friend - the first meeting, pictures.png")
+                                memory = pygame.transform.scale(memory, (1400,800))
+                                memory_rect = memory.get_rect(center = (640, 360))
+                                screen.blit(memory, memory_rect)
+                                pygame.display.update()
+                                time.sleep(5)
                             if current_dialogue == 2 and level == "bestfriend":
                                 all_sprites.remove(raccoon)     
                                 raccoon.kill()
