@@ -179,6 +179,25 @@ all_sprites = pygame.sprite.Group()
 font = pygame.font.SysFont('comicsansms', 20)
 pink = (255, 105, 180)
 
+def theEnd():
+    credits1 = pygame.image.load("credits 1.png")
+    credits2 = pygame.image.load("credits 2.png")
+    creditsList = [credits1, credits2]
+    creditsRect = credits1.get_rect(center = (640, 360))
+    running = True
+    while running:
+        screen.blit(creditsList[0], creditsRect)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+                elif event.key == K_RETURN:
+                    creditsList.append(creditsList[0])
+                    creditsList.pop(0)
+        pygame.display.update()
+
 # Add after defining your font (or near top)
 def wrap_text(text, font, max_width):
     words = text.split()
@@ -529,5 +548,5 @@ while running:
                     level = levels[n]
     clock.tick(60)
     pygame.display.update()
-
+theEnd()
 pygame.quit()
