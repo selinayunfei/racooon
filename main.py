@@ -78,12 +78,120 @@ def opening_sequence():
         
         pygame.display.flip()         
 
+def create_raccoon(image):
+    raccoon = pygame.sprite.Sprite()
+    raccoon.image = pygame.image.load(image).convert_alpha()
+    raccoon.image = pygame.transform.scale(raccoon.image, (1280, 720))
+    raccoon.rect = raccoon.image.get_rect(center = (640, 360))
+    raccoon.speed = 1
+    return raccoon
+
+def update_raccoon(raccoon):
+    raccoon.rect.move_ip(0,raccoon.speed)
+    if raccoon.rect.centery <= 340 or raccoon.rect.centery >= 380:
+        raccoon.speed = -raccoon.speed
+
+def ending(end):
+    cont = False
+    def create_text_box(text, end):
+        box = pygame.sprite.Sprite()
+        box.image = pygame.image.load("box.png").convert_alpha()
+        if end == "TVG" or end == "TVB":
+            box.rect = box.image.get_rect(center=(640, 100))
+        else:
+            box.rect = box.image.get_rect(center=(640, 620))
+        box.text = text
+        return box
+    SCREEN_WIDTH = 1280
+    SCREEN_HEIGHT = 720
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    frame = 0
+    all_sprites = pygame.sprite.Group()
+    font = pygame.font.SysFont('comicsansms', 20)
+    running = True
+    start = True
+    while running:
+        if start:
+            current_dialogue = 0
+            current_line = 0
+            if end == "WeddingH":
+                bg = pygame.image.load("EweddingH.png")
+                dialogue = ["There's no one here...", "He abandoned you because of your gold digging!", "Yikes!", "You're free, but really poor :(", "Go find a job, buddy."]
+            elif end == "WeddingB":
+                bg = pygame.image.load("EweddingB.png")
+                dialogue = ["Your future husband is waiting for you.", "He thinks you like him for his personality (you don't)", "He thinks you don't care about money (you really do)","You live miserably for like a few years", "then you die lol", "better luck next time!"]
+            elif end == "TVG":
+                bg = pygame.image.load("TVG.png")
+                dialogue = ["...who the hell is that on TV???", "oh my god its that really weird guy","i guess he's famous???", "did he just publically doxx you.","his fans are gonna murder you oh my god","at least he hates you so you don't have to date him","good job ig??? watch out for the crazy fans"]
+            elif end == "TVB":
+                bg = pygame.image.load("TVB.png")
+                dialogue = ["...who the hell is that on TV???", "oh my god it's that really weird guy", "he's famous?!?!?!?!?!","DID HE","DID HE JUST PROFESS HIS UNDYING LOVE","ON LIVE TV???? TO YOU???","W H A T T H E F L I P","YOU DON'T EVEN LIKE HIM","the door opens.","you're so screwed.","better luck next time!","i'm so sorryfor this (no)"]
+            elif end == "THG":
+                bg = pygame.image.load("THG.png")
+                dialogue = ["You're here.","...He's not coming is he lol","yeah uh you wouldn't come back either","after how rude you were yesterday","poor dude","is not having to deal with him a L or a W though","depends on what you read ig","good job (?) you made it past all 3","you get to keep single pringle status","should we clap?","do you really hate raccoons that much???","welp","go enjoy your ending animation"]
+            elif end == "THB":
+                bg = pygame.image.load("THB.png")
+                dialogue = ["Oh my god he's already here","How long has he been here???","You'd call him a good boy but i've made you put up with enough","sorry (not)","he looks so eager lol","you had to give in at some point hmmm","...(furry?)","SORRY","YKW ITS VALID OF YOU","enjoy your marriage","although you did lose L","bye IG"]
+            text_box = create_text_box(dialogue[current_dialogue], end)
+            all_sprites.add(text_box)
+            start = False
+            
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    running = False
+                elif event.key == K_RETURN:
+                    if current_dialogue < len(dialogue) - 1:
+                        current_dialogue += 1
+                    else:
+                        if end[-1] == 'H' or end[-1]=='G':
+                            running = False
+                            cont = True
+                        else:
+                            running = False
+                            cont = False
+        screen.blit(bg, (0,0))
+        all_sprites.draw(screen)
+        all_sprites.remove(text_box)
+        text_box.kill()
+        text_box = create_text_box(dialogue[current_dialogue], end)
+        all_sprites.add(text_box)
+        if text_box.alive():
+            text_surface = font.render(text_box.text, True, (0, 0, 0))
+            if end == "TVG" or end == "TVB":
+                text_rect = text_surface.get_rect(center=(640, 100))
+            else:
+                text_rect = text_surface.get_rect(center=(640, 620))
+            screen.blit(text_surface, text_rect)
+        pygame.display.update()
+    return cont
 
 screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 bg = pygame.image.load("wp5641813.webp")
 
 all_sprites = pygame.sprite.Group()
 font = pygame.font.SysFont('comicsansms', 20)
+
+# Add after defining your font (or near top)
+def wrap_text(text, font, max_width):
+    words = text.split()
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = f"{current_line} {word}".strip()
+        if font.size(test_line)[0] <= max_width:
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+
+    return lines
+
 
 # Game state
 lovebars = ["0.png","25.png","50.png","75.png","100.png"]
@@ -94,13 +202,19 @@ level = levels[n]
 newChoice = True
 running = True
 start = True
+frame = 0
+opening_sequence()
 while running:
+    frame += 1
     if start:
+        frame = 0
         current_dialogue = 0
         current_line = 0
         if level == "richguy":
+            raccoon = create_raccoon("richguy_default_smirk.png")
+            all_sprites.add(raccoon)
             lovebar = LoveBar('25.png',(300,60))
-            nl = 3
+            nl = 1
 
             colour = "yellow"
             dialogue = [
@@ -149,7 +263,8 @@ while running:
         all_sprites.add(text_box)
 
         start = False
-
+    if frame % 10 == 0:
+        update_raccoon(raccoon)
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False
@@ -173,19 +288,26 @@ while running:
     
     # Render the current text
     if text_box.alive():
-        text_surface = font.render(text_box.text, True, (0, 0, 0))
-        text_rect = text_surface.get_rect(center=(640, 620))
-        screen.blit(text_surface, text_rect)
+        lines = wrap_text(text_box.text, font, 900)
+        y = 590  # Start a bit above 620 to center multi-line
+        for line in lines:
+            text_surface = font.render(line, True, (0, 0, 0))
+            text_rect = text_surface.get_rect(center=(640, y))
+            screen.blit(text_surface, text_rect)
+            y += 25  # Adjust spacing between lines
+
     # Render choices if at the end of dialogue
     if current_line == len(dialogue[current_dialogue]) - 1:
-        choice_height = 350
+        choice_height = 375
         if current_dialogue < 4:
             if current_dialogue < 3:
                 for choice in choices[current_dialogue]:
-                    choice_surface = font.render(choice, True, (0, 0, 0))
-                    choice_rect = choice_surface.get_rect(center=(1000, choice_height))
-                    screen.blit(choice_surface, choice_rect)
-                    choice_height += 40
+                    wrapped = wrap_text(choice, font, 450)
+                    for line in wrapped:
+                        choice_surface = font.render(line, True, (0, 0, 0))
+                        choice_rect = choice_surface.get_rect(center=(1000, choice_height))
+                        screen.blit(choice_surface, choice_rect)
+                        choice_height += 25
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
                         newChoice = False
                         current_dialogue += 1
@@ -206,10 +328,12 @@ while running:
                         all_sprites.add(text_box)
             elif current_dialogue == 3:
                 for choice in choices[current_dialogue][currentChoice]:
-                    choice_surface = font.render(choice, True, (0, 0, 0))
-                    choice_rect = choice_surface.get_rect(center=(1000, choice_height))
-                    screen.blit(choice_surface, choice_rect)
-                    choice_height += 40
+                    wrapped = wrap_text(choice, font, 450)
+                    for line in wrapped:
+                        choice_surface = font.render(line, True, (0, 0, 0))
+                        choice_rect = choice_surface.get_rect(center=(1000, choice_height))
+                        screen.blit(choice_surface, choice_rect)
+                        choice_height += 25  # smaller spacing since it's in a tighter box
                     if (pressed_keys[K_1] or pressed_keys[K_2] or pressed_keys[K_3]) and newChoice:
                         nl = updating_lovebar(nl,lovebars,lovebar)
                         newChoice = False
@@ -260,9 +384,25 @@ while running:
             all_sprites.remove(lovebar)
             if pressed_keys[K_RETURN]:
                 n += 1
+                start = True
+            if start:
+                if level == "richguy":
+                    if nl <= 0:
+                        running = ending("WeddingH")
+                    else:
+                        running = ending("WeddingB")
+                elif level == "weirdguy":
+                    if nl <= 0:
+                        running = ending("TVG")
+                    else:
+                        running = ending("TVB")
+                elif level == "bestfriend":
+                    if nl <= 0:
+                        running = ending("THG")
+                    else:
+                        running = ending("THB")
                 if n < len(levels):
                     level = levels[n] 
-                    start = True
     pygame.display.update()
 
 pygame.quit()
